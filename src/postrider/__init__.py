@@ -1,3 +1,4 @@
+import logging
 import typing as t
 from mailbox import Mailbox, Maildir
 from pathlib import Path
@@ -28,17 +29,6 @@ def create_message(origin, targets, subject, text, html=None):
     return msg
 
 
-class PostRider:
-
-   def __init__(self, mailer: Courrier, mailbox: Mailbox):
-       self.mailer = mailer
-       self.mailbox = mailbox
-       self.processor = ProcessorThread(
-           mailer=mailer,
-           mailbox=mailbox
-       )
-
-
 def configure_logging(settings, debug: bool = False):
     import sys
     import logging
@@ -54,19 +44,26 @@ def configure_logging(settings, debug: bool = False):
 
 
 @cli
-def processor(config: Path, forever: bool = True, debug: bool = False):
+def sender(config: Path, forever: bool = True, debug: bool = False):
     from dynaconf import Dynaconf
 
     settings = Dynaconf(settings_files=[config])
     configure_logging(settings, debug=debug)
-
     mailer = Courrier(SMTPConfiguration(**settings.smtp))
-    mailbox = Maildir(settings.box.path)
-    postrider = PostRider(mailer, mailbox)
-    postrider.processor.run(
-        interval=settings.daemon.interval,
-        forever=forever
-    )
+
+    workers = {}
+    for name, conf in settings.box.items():
+        path = Path(conf.path).resolve()
+        assert path not in workers
+        mailbox = Maildir(path)
+        interval = settings.worker[name].get('interval', 5.0)
+        workers[path] = ProcessorThread(mailer, mailbox, interval)
+
+    for name, worker in workers.items():
+        worker.start()
+
+    for name, worker in workers.items():
+        worker.join()
 
 
 @cli

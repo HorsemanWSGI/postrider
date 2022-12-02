@@ -10,10 +10,11 @@ class ProcessorThread(threading.Thread):
 
     _running: bool = False
 
-    def __init__(self, mailer, mailbox):
+    def __init__(self, mailer, mailbox, interval: float):
         super().__init__(name=__name__)
         self.mailer = mailer
         self.mailbox = mailbox
+        self.interval = interval
         self.setDaemon(True)
 
     def salvo(self):
@@ -31,13 +32,13 @@ class ProcessorThread(threading.Thread):
         finally:
             self.mailbox.close()
 
-    def run(self, interval: float = 5.0, forever: bool = True):
+    def run(self, forever: bool = True):
         self._running = True
         while self._running:
             try:
                 self.salvo()
-                logger.debug(f'Sleeping for {interval}.')
-                time.sleep(interval)
+                logger.debug(f'Sleeping for {self.interval}.')
+                time.sleep(self.interval)
             except:
                 self._running = False
                 raise
