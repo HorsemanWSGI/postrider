@@ -67,11 +67,11 @@ def sender(config: Path, forever: bool = True, debug: bool = False):
 
 
 @cli
-def testmail(config: Path):
+def testmail(config: Path, boxname: str):
     from dynaconf import Dynaconf
 
     settings = Dynaconf(settings_files=[config])
-    mailbox = Maildir(settings.box.path)
+    mailbox = Maildir(settings.box[boxname].path)
     msg = create_message(
         'test@test.org',
         ['trollfot@gmail.com'],

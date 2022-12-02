@@ -7,4 +7,4 @@ emitter = "notifier@test.org"
 path = "/tmp/mybox"
 
 [worker.mine]
-interval = 5.0
+interval = 0.1

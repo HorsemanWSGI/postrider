@@ -13,10 +13,10 @@ Running fake server
 Starting the worker
 -------------------
 
-  $ postrider processor post.toml
+  $ postrider sender post.toml
 
 
 Adding a test mail
 ------------------
 
-  $ postrider testmail post.toml
+  $ postrider testmail post.toml BOXNAME
