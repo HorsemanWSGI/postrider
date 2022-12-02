@@ -5,6 +5,7 @@ setup(
     name='postrider',
     install_requires=[
         'minicli',
+        'dynaconf',
     ],
     extras_require={
         'test': [

@@ -7,4 +7,4 @@ emitter = "notifier@test.org"
 path = "/tmp/mybox"
 
 [daemon]
-interval = 5.0
+interval = 4.0

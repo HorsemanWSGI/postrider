@@ -39,6 +39,6 @@ class Courrier:
     def sender(self):
         server = self.connect()
         try:
-            yield server.sendmail
+            yield server.send_message
         finally:
             server.close()

@@ -1,5 +1,9 @@
 import time
+import logging
 import threading
+
+
+logger = logging.getLogger(__name__)
 
 
 class ProcessorThread(threading.Thread):
@@ -18,8 +22,11 @@ class ProcessorThread(threading.Thread):
             with self.mailer.sender() as sender:
                 for key, message in self.mailbox.iteritems():
                     if not self._running:
+                        logger.warning('Processor was stopped.')
                         raise StopIteration('Thread has stopped running')
+                    logger.debug(f'Sending {key}.')
                     sender(message)
+                    logger.debug(f'Discarding {key}.')
                     self.mailbox.discard(key)
         finally:
             self.mailbox.close()
@@ -29,6 +36,7 @@ class ProcessorThread(threading.Thread):
         while self._running:
             try:
                 self.salvo()
+                logger.debug(f'Sleeping for {interval}.')
                 time.sleep(interval)
             except:
                 self._running = False
