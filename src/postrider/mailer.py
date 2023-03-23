@@ -5,7 +5,6 @@ from contextlib import contextmanager
 
 
 class SMTPConfiguration(t.NamedTuple):
-    emitter: str
     port: int = 25
     host: str = "localhost"
     user: str = None
