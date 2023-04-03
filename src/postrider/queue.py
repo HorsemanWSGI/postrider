@@ -15,7 +15,11 @@ class ProcessorThread(threading.Thread):
         self.mailer = mailer
         self.mailbox = mailbox
         self.interval = interval
-        self.setDaemon(True)
+        self.daemon = True
+
+    def stop(self):
+        if self._running:
+            self._running = False
 
     def salvo(self):
         self.mailbox.lock()
@@ -34,11 +38,14 @@ class ProcessorThread(threading.Thread):
 
     def run(self, forever: bool = True):
         self._running = True
-        while self._running:
-            try:
-                self.salvo()
-                logger.debug(f'Sleeping for {self.interval}.')
-                time.sleep(self.interval)
-            except:
-                self._running = False
-                raise
+        self.salvo()
+        if forever:
+            time.sleep(self.interval)
+            while self._running:
+                try:
+                    self.salvo()
+                    logger.debug(f'Sleeping for {self.interval}.')
+                    time.sleep(self.interval)
+                except:
+                    self._running = False
+                    raise
