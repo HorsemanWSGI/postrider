@@ -1,5 +1,6 @@
 import logging
 import typing as t
+from io import IOBase
 from mailbox import Mailbox, Maildir
 from pathlib import Path
 from email.utils import make_msgid
@@ -10,7 +11,13 @@ from .mailer import SMTPConfiguration, Courrier
 from .queue import ProcessorThread
 
 
-def create_message(origin, targets, subject, text, html=None):
+def create_message(
+        origin: str,
+        targets: str,
+        subject: str,
+        text: str,
+        html: str = None,
+        files: list[Path | str | IOBase] = None):
     msg = MIMEMultipart("alternative")
     msg["From"] = origin
     msg["To"] = ','.join(targets)
@@ -25,6 +32,30 @@ def create_message(origin, targets, subject, text, html=None):
         part2 = MIMEText(html, "html")
         part2.set_charset("utf-8")
         msg.attach(part2)
+
+    if files:
+        for name, f in files.items():
+            if isinstance(f, str):
+                with open(f, "rb") as fd:
+                    part = MIMEApplication(
+                        fd.read(),
+                        Name=name
+                    )
+            elif isinstance(f, Path):
+                with f.open("rb") as fd:
+                    part = MIMEApplication(
+                        fd.read(),
+                        Name=name
+                    )
+            elif isinstance(f, IOBase):
+                part = MIMEApplication(
+                    f.read(),
+                    Name=name
+                )
+            part['Content-Disposition'] = (
+                f'attachment; filename="{name}"'
+            )
+            msg.attach(part)
 
     return msg
 
