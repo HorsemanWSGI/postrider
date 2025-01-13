@@ -12,15 +12,16 @@ from .queue import ProcessorThread
 
 
 def create_message(
-        origin: str,
-        targets: str,
-        subject: str,
-        text: str,
-        html: str = None,
-        files: list[Path | str | IOBase] = None):
+    origin: str,
+    targets: str,
+    subject: str,
+    text: str,
+    html: str = None,
+    files: list[Path | str | IOBase] = None,
+):
     msg = MIMEMultipart("alternative")
     msg["From"] = origin
-    msg["To"] = ','.join(targets)
+    msg["To"] = ",".join(targets)
     msg["Subject"] = subject
     msg.set_charset("utf-8")
 
@@ -37,24 +38,13 @@ def create_message(
         for name, f in files.items():
             if isinstance(f, str):
                 with open(f, "rb") as fd:
-                    part = MIMEApplication(
-                        fd.read(),
-                        Name=name
-                    )
+                    part = MIMEApplication(fd.read(), Name=name)
             elif isinstance(f, Path):
                 with f.open("rb") as fd:
-                    part = MIMEApplication(
-                        fd.read(),
-                        Name=name
-                    )
+                    part = MIMEApplication(fd.read(), Name=name)
             elif isinstance(f, IOBase):
-                part = MIMEApplication(
-                    f.read(),
-                    Name=name
-                )
-            part['Content-Disposition'] = (
-                f'attachment; filename="{name}"'
-            )
+                part = MIMEApplication(f.read(), Name=name)
+            part["Content-Disposition"] = f'attachment; filename="{name}"'
             msg.attach(part)
 
     return msg
@@ -69,9 +59,11 @@ def configure_logging(settings, debug: bool = False):
     stream_handler.setLevel(log_level)
     logging.basicConfig(
         level=log_level,
-        format='%(asctime)s %(levelname)s %(module)s %(message)s',
-        handlers=[stream_handler]
+        format="%(asctime)s %(levelname)s %(module)s %(message)s",
+        handlers=[stream_handler],
     )
+    logger = logging.getLogger("postrider")
+    return logger
 
 
 @cli
@@ -79,7 +71,8 @@ def sender(config: Path, forever: bool = True, debug: bool = False):
     from dynaconf import Dynaconf
 
     settings = Dynaconf(settings_files=[config])
-    configure_logging(settings, debug=debug)
+    logger = configure_logging(settings, debug=debug)
+    logger.info("Start Mail Sender")
     mailer = Courrier(SMTPConfiguration(**settings.smtp))
 
     workers = {}
@@ -87,7 +80,7 @@ def sender(config: Path, forever: bool = True, debug: bool = False):
         path = Path(conf.path).resolve()
         assert path not in workers
         mailbox = Maildir(path)
-        interval = settings.worker[name].get('interval', 5.0)
+        interval = settings.worker[name].get("interval", 5.0)
         workers[path] = ProcessorThread(mailer, mailbox, interval)
 
     for name, worker in workers.items():
@@ -104,10 +97,7 @@ def testmail(config: Path, boxname: str):
     settings = Dynaconf(settings_files=[config])
     mailbox = Maildir(settings.box[boxname].path)
     msg = create_message(
-        'test@test.org',
-        ['trollfot@gmail.com'],
-        'This is a subject',
-        'This is my email'
+        "test@test.org", ["trollfot@gmail.com"], "This is a subject", "This is my email"
     )
     mailbox.add(msg)
 
@@ -115,5 +105,6 @@ def testmail(config: Path, boxname: str):
 def clirunner():
     run()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     run()
