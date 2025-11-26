@@ -6,6 +6,7 @@ from pathlib import Path
 from email.utils import make_msgid
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.mime.application import MIMEApplication
 from minicli import cli, run
 from .mailer import SMTPConfiguration, Courrier
 from .queue import ProcessorThread
