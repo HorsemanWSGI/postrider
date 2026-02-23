@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "postrider"
+version = "0.1"
+license = {text = "MIT"}
+authors = [{name = "Souheil Chelfouh", email = "trollfot@gmail.com"}]
+maintainers = [{name = "Souheil Chelfouh", email = "trollfot@gmail.com"}]
+classifiers = [
+  "Environment :: Web Environment", "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Topic :: Communications :: Email"
+]
+description = "Mailbox management for batched or delayed email delivery"
+readme = {file = "README.rst", content-type = "text/x-rst"}
+requires-python = ">=3.9"
+dependencies = ["dynaconf", "minicli"]
+
+[project.urls]
+"Source Code" = ""
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[project.scripts]
+postrider = "postrider:clirunner"
