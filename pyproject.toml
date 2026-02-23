@@ -21,7 +21,7 @@ requires-python = ">=3.9"
 dependencies = ["dynaconf", "minicli"]
 
 [project.urls]
-"Source Code" = ""
+"Source Code" = "https://github.com/HorsemanWSGI/postrider"
 
 [project.optional-dependencies]
 test = ["pytest"]
