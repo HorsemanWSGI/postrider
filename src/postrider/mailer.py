@@ -1,6 +1,5 @@
 import typing as t
 import smtplib
-import logging
 from contextlib import contextmanager
 
 

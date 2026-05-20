@@ -1,6 +1,8 @@
 import time
 import logging
 import threading
+from mailbox import Mailbox
+from .mailer import Courrier
 
 
 logger = logging.getLogger(__name__)
@@ -10,7 +12,7 @@ class ProcessorThread(threading.Thread):
 
     _running: bool = False
 
-    def __init__(self, mailer, mailbox, interval: float):
+    def __init__(self, mailer: Courrier, mailbox: Mailbox, interval: float):
         super().__init__(name=__name__)
         self.mailer = mailer
         self.mailbox = mailbox
@@ -49,6 +51,7 @@ class ProcessorThread(threading.Thread):
                     'salvo failed; will retry in %.1fs', self.interval
                 )
             if not forever:
+                self._running = False
                 break
             logger.debug(f'Sleeping for {self.interval}.')
             time.sleep(self.interval)

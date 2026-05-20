@@ -1,9 +1,8 @@
+import sys
 import logging
-import typing as t
 from io import IOBase
-from mailbox import Mailbox, Maildir
+from mailbox import Maildir
 from pathlib import Path
-from email.utils import make_msgid
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
@@ -52,9 +51,6 @@ def create_message(
 
 
 def configure_logging(settings, debug: bool = False):
-    import sys
-    import logging
-
     log_level = logging.DEBUG if debug else settings.logging.level
     stream_handler = logging.StreamHandler(stream=sys.stdout)
     stream_handler.setLevel(log_level)
@@ -98,7 +94,10 @@ def testmail(config: Path, boxname: str):
     settings = Dynaconf(settings_files=[config])
     mailbox = Maildir(settings.box[boxname].path)
     msg = create_message(
-        "test@test.org", ["trollfot@gmail.com"], "This is a subject", "This is my email"
+        "test@test.org",
+        ["trollfot@gmail.com"],
+        "This is a subject",
+        "This is my email"
     )
     mailbox.add(msg)
 
