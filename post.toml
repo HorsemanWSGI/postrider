@@ -1,7 +1,6 @@
 [smtp]
 host = "127.0.0.1"
 port = "25"
-emitter = "notifier@test.org"
 
 [box.mine]
 path = "/tmp/mybox"

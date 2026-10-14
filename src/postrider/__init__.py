@@ -1,5 +1,6 @@
 import sys
 import logging
+from typing import Mapping
 from io import IOBase
 from mailbox import Maildir
 from pathlib import Path
@@ -9,6 +10,17 @@ from email.mime.application import MIMEApplication
 from minicli import cli, run
 from .mailer import SMTPConfiguration, Courrier
 from .queue import ProcessorThread
+
+
+
+def read_configuration(*config_files: str) -> Mapping:
+    from dynaconf import Dynaconf
+
+    return Dynaconf(
+        settings_files=config_files,
+        envvar_prefix="POSTRIDER",
+    )
+
 
 
 def create_message(
@@ -65,9 +77,7 @@ def configure_logging(settings, debug: bool = False):
 
 @cli
 def sender(config: Path, forever: bool = True, debug: bool = False):
-    from dynaconf import Dynaconf
-
-    settings = Dynaconf(settings_files=[config])
+    settings = read_configuration(config)
     logger = configure_logging(settings, debug=debug)
     logger.info("Start Mail Sender")
     mailer = Courrier(SMTPConfiguration(**settings.smtp))
@@ -89,9 +99,7 @@ def sender(config: Path, forever: bool = True, debug: bool = False):
 
 @cli
 def testmail(config: Path, boxname: str):
-    from dynaconf import Dynaconf
-
-    settings = Dynaconf(settings_files=[config])
+    settings = read_configuration(config)
     mailbox = Maildir(settings.box[boxname].path)
     msg = create_message(
         "test@test.org",

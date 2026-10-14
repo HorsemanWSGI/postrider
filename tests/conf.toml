@@ -1,0 +1,9 @@
+[smtp]
+host = "127.0.0.1"
+port = "25"
+
+[box.mine]
+path = "/tmp/mybox"
+
+[worker.mine]
+interval = 0.1
