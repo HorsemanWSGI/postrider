@@ -10,7 +10,7 @@ HERE = Path(__file__).parent
 
 def test_settings():
     settings = read_configuration(HERE / 'conf.toml')
-    config = SMTPConfiguration(**settings.smtp)
+    config = SMTPConfiguration.factory(**settings.smtp)
     assert config.port == "25"
 
 
@@ -19,7 +19,7 @@ def test_settings_envvar():
     try:
         os.environ['POSTRIDER_SMTP__PORT'] = "'666'"
         settings = read_configuration(HERE / 'conf.toml')
-        config = SMTPConfiguration(**settings.smtp)
+        config = SMTPConfiguration.factory(**settings.smtp)
         assert config.port == "666"
     finally:
         os.environ.clear()

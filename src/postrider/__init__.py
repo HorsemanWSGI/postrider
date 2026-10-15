@@ -80,7 +80,7 @@ def sender(config: Path, forever: bool = True, debug: bool = False):
     settings = read_configuration(config)
     logger = configure_logging(settings, debug=debug)
     logger.info("Start Mail Sender")
-    mailer = Courrier(SMTPConfiguration(**settings.smtp))
+    mailer = Courrier(SMTPConfiguration.factory(**settings.smtp))
 
     workers = {}
     for name, conf in settings.box.items():

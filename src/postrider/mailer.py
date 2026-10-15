@@ -4,11 +4,27 @@ from contextlib import contextmanager
 
 
 class SMTPConfiguration(t.NamedTuple):
-    port: int = 25
-    host: str = "localhost"
-    user: str = None
-    password: str = None
-    debug: bool = False
+    port: int
+    host: str
+    user: str | None
+    password: str | None
+    debug: bool
+
+    @classmethod
+    def factory(cls, *,
+                port: int = 25,
+                host: str = "localhost",
+                user: str | None = None,
+                password: str | None = None,
+                debug: bool = False,
+                **kwargs):
+        return cls(
+            port=port,
+            host=host,
+            user=user,
+            password=password,
+            debug=debug
+        )
 
 
 class Courrier:
