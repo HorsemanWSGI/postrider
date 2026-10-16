@@ -1,6 +1,7 @@
 [smtp]
 host = "127.0.0.1"
 port = "25"
+mailbox = "test"
 
 [box.mine]
 path = "/tmp/mybox"
